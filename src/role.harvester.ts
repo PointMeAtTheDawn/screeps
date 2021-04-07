@@ -1,12 +1,13 @@
 export function run(creep: Creep): void {
   const spawn = creep.room.find<Spawn>(FIND_MY_SPAWNS)[0];
-  const energySource = creep.pos.findClosestByRange<FIND_SOURCES_ACTIVE>(FIND_SOURCES_ACTIVE);
+  const close = spawn.pos.findClosestByRange<FIND_SOURCES_ACTIVE>(FIND_SOURCES_ACTIVE);
+  const far = creep.room.find<FIND_SOURCES_ACTIVE>(FIND_SOURCES_ACTIVE).filter(s => s !== close);
 
   if (creep.store.getFreeCapacity() === 0) {
     _moveToDropEnergy(creep, spawn);
   } else {
-    if (energySource != null) {
-      _moveToHarvest(creep, energySource);
+    if (far != null) {
+      _moveToHarvest(creep, far[0]);
     }
   }
 }
