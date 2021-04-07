@@ -1,6 +1,6 @@
 export function run(creep: Creep): void {
   const spawn = creep.room.find<Spawn>(FIND_MY_SPAWNS)[0];
-  const energySource = creep.room.find<Source>(FIND_SOURCES_ACTIVE)[0];
+  const energySource = creep.room.find<FIND_SOURCES_ACTIVE>(FIND_SOURCES_ACTIVE)[0];
 
   if (creep.store.getFreeCapacity() === 0) {
     _moveToDropEnergy(creep, spawn);

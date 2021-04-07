@@ -26,13 +26,13 @@ export function run(room: Room): void {
 }
 
 function _loadCreeps(room: Room) {
-  creeps = room.find<Creep>(FIND_MY_CREEPS);
+  creeps = room.find<FIND_MY_CREEPS>(FIND_MY_CREEPS);
   creepCount = _.size(creeps);
   harvesters = _.filter(creeps, creep => creep.memory.role === "harvester");
 }
 
 function _buildMissingCreeps(room: Room) {
-  let bodyParts: string[];
+  let bodyParts: BodyPartConstant[];
 
   const spawns: Spawn[] = room.find<Spawn>(FIND_MY_SPAWNS, {
     filter: (spawn: Spawn) => {
@@ -53,9 +53,10 @@ function _buildMissingCreeps(room: Room) {
   }
 }
 
-function _spawnCreep(spawn: Spawn, bodyParts: string[], role: string) {
+function _spawnCreep(spawn: Spawn, bodyParts: BodyPartConstant[], role: string) {
   const uuid: number = Memory.uuid;
-  let status: number | string = spawn.canCreateCreep(bodyParts, undefined);
+  const creepName: string = spawn.room.name + " - " + role + uuid;
+  let status: number | string = spawn.spawnCreep(bodyParts, creepName, { dryRun: true });
 
   const properties: { [key: string]: any } = {
     role,
@@ -65,14 +66,13 @@ function _spawnCreep(spawn: Spawn, bodyParts: string[], role: string) {
   status = _.isString(status) ? OK : status;
   if (status === OK) {
     Memory.uuid = uuid + 1;
-    const creepName: string = spawn.room.name + " - " + role + uuid;
 
     log.info("Started creating new creep: " + creepName);
     if (Config.ENABLE_DEBUG_MODE) {
       log.info("Body: " + bodyParts);
     }
 
-    status = spawn.createCreep(bodyParts, creepName, properties);
+    status = spawn.spawnCreep(bodyParts, creepName, properties);
 
     return _.isString(status) ? OK : status;
   } else {
