@@ -5,6 +5,8 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "rollup-plugin-typescript2";
 import screeps from "rollup-plugin-screeps";
+import replace from '@rollup/plugin-replace';
+import sourcemaps from 'rollup-plugin-sourcemaps';
 
 let cfg;
 const dest = process.env.DEST;
@@ -27,6 +29,16 @@ export default {
     resolve({ rootDir: "src" }),
     commonjs(),
     typescript({ tsconfig: "./tsconfig.json" }),
-    screeps({ config: cfg, dryRun: cfg == null })
+    screeps({ config: cfg, dryRun: cfg == null }),
+    sourcemaps(),
+    replace({
+      // returns 'true' if code is bundled in prod mode
+      PRODUCTION: JSON.stringify(true),
+      preventAssignment: true,
+      // you can also use this to include deploy-related data, such as
+      // date + time of build, as well as latest commit ID from git
+      __BUILD_TIME__: JSON.stringify(Date.now()),
+      __REVISION__: JSON.stringify(require('git-rev-sync').short()),
+    })
   ]
 };

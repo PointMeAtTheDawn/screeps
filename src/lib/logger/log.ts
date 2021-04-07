@@ -120,25 +120,25 @@ export class Log {
 
   public error(...args: any[]) {
     if (this.level >= LogLevels.ERROR) {
-      console.log.apply(this, this.buildArguments(LogLevels.ERROR).concat([].slice.call(args)));
+      console.log(this.buildArguments(LogLevels.ERROR).concat([].slice.call(args)));
     }
   }
 
   public warning(...args: any[]) {
     if (this.level >= LogLevels.WARNING) {
-      console.log.apply(this, this.buildArguments(LogLevels.WARNING).concat([].slice.call(args)));
+      console.log(this.buildArguments(LogLevels.WARNING).concat([].slice.call(args)));
     }
   }
 
   public info(...args: any[]) {
     if (this.level >= LogLevels.INFO) {
-      console.log.apply(this, this.buildArguments(LogLevels.INFO).concat([].slice.call(args)));
+      console.log(this.buildArguments(LogLevels.INFO).concat([].slice.call(args)));
     }
   }
 
   public debug(...args: any[]) {
     if (this.level >= LogLevels.DEBUG) {
-      console.log.apply(this, this.buildArguments(LogLevels.DEBUG).concat([].slice.call(args)));
+      console.log(this.buildArguments(LogLevels.DEBUG).concat([].slice.call(args)));
     }
   }
 

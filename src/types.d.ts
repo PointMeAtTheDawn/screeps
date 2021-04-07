@@ -3,6 +3,7 @@
 // memory extension samples
 interface CreepMemory {
   role: string;
+  target: string;
   room: string;
   working: boolean;
 }
@@ -16,5 +17,8 @@ interface Memory {
 declare namespace NodeJS {
   interface Global {
     log: any;
+    Profiler: Profiler
   }
 }
+
+declare const __REVISION__: string;

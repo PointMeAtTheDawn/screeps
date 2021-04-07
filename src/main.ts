@@ -1,21 +1,68 @@
-import { ErrorMapper } from "utils/ErrorMapper";
-import * as harvester from "role.harvester";
+import * as CreepManager from "./creepManager";
 
-// When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
-// This utility uses source maps to get the line numbers and file names of the original, TS source code
-export const loop = ErrorMapper.wrapLoop(() => {
-  console.log(`Current game tick is ${Game.time}`);
+// uncomment the following line if you want to use the profiler
+import * as Profiler from "lib/Profiler";
+// import { profileRecord } from "lib/Profiler";
+// import { profile } from "lib/Profiler";
 
-  // Automatically delete memory of missing creeps
-  for (const name in Memory.creeps) {
-    if (!(name in Game.creeps)) {
-      delete Memory.creeps[name];
+import { log } from "./lib/logger/log";
+
+// Any code written outside the `loop()` method is executed only when the
+// Screeps system reloads your script.
+// Use this bootstrap wisely. You can cache some of your stuff to save CPU.
+// You should extend prototypes before the game loop executes here.
+
+// uncomment the following line if you want to use the profiler
+// see the documentation https://github.com/screepers/screeps-typescript-profiler
+global.Profiler = Profiler.init();
+
+log.info(`loading revision: ${__REVISION__}`);
+
+export class Main
+{
+    public static go()
+    {
+        // Check memory for null or out of bounds custom objects
+        if (!Memory.uuid || Memory.uuid > 1000)
+        {
+            Memory.uuid = 0;
+        }
+
+        for (const i in Game.rooms)
+        {
+            const room: Room = Game.rooms[i];
+
+            CreepManager.run(room);
+
+            // Clears any non-existing creep memory.
+            for (const name in Memory.creeps)
+            {
+                const creep: CreepMemory = Memory.creeps[name];
+
+                if (creep.room === room.name)
+                {
+                    if (!Game.creeps[name])
+                    {
+                        log.info("Clearing non-existing creep memory:", name);
+                        delete Memory.creeps[name];
+                    }
+                }
+            }
+        }
     }
-  }
+}
 
-  _.each(Game.creeps, (creep: Creep) => {
-    if (creep.name.startsWith("Harvester")) {
-      harvester.run(creep);
-    }
-  });
-});
+function mainLoop()
+{
+    Main.go();
+}
+
+/**
+ * Screeps system expects this "loop" method in main.js to run the
+ * application. If we have this line, we can be sure that the globals are
+ * bootstrapped properly and the game loop is executed.
+ * http://support.screeps.com/hc/en-us/articles/204825672-New-main-loop-architecture
+ *
+ * @export
+ */
+export const loop = mainLoop;
