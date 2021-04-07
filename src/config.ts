@@ -41,7 +41,6 @@ export const LOG_VSC = { repo: "@@_repo_@@", revision: "@@_revision_@@", valid: 
 /**
  * URL template for VSC links, this one works for github and gitlab.
  */
-export const LOG_VSC_URL_TEMPLATE = (path: string, line: string) =>
-{
-    return `${LOG_VSC.repo}/blob/${LOG_VSC.revision}/${path}#${line}`;
+export const LOG_VSC_URL_TEMPLATE = (path: string, line: string) => {
+  return `${LOG_VSC.repo}/blob/${LOG_VSC.revision}/${path}#${line}`;
 };

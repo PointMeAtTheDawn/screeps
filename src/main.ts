@@ -13,8 +13,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
     }
   }
 
-  _.each(Game.creeps, (creep: Creep) =>
-  {
+  _.each(Game.creeps, (creep: Creep) => {
     if (creep.name.startsWith("Harvester")) {
       harvester.run(creep);
     }
