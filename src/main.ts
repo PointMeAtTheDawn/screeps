@@ -18,43 +18,35 @@ global.Profiler = Profiler.init();
 
 log.info(`loading revision: ${__REVISION__}`);
 
-export class Main
-{
-    public static go()
-    {
-        // Check memory for null or out of bounds custom objects
-        if (!Memory.uuid || Memory.uuid > 1000)
-        {
-            Memory.uuid = 0;
-        }
-
-        for (const i in Game.rooms)
-        {
-            const room: Room = Game.rooms[i];
-
-            CreepManager.run(room);
-
-            // Clears any non-existing creep memory.
-            for (const name in Memory.creeps)
-            {
-                const creep: CreepMemory = Memory.creeps[name];
-
-                if (creep.room === room.name)
-                {
-                    if (!Game.creeps[name])
-                    {
-                        log.info("Clearing non-existing creep memory:", name);
-                        delete Memory.creeps[name];
-                    }
-                }
-            }
-        }
+export class Main {
+  public static go() {
+    // Check memory for null or out of bounds custom objects
+    if (!Memory.uuid || Memory.uuid > 1000) {
+      Memory.uuid = 0;
     }
+
+    for (const i in Game.rooms) {
+      const room: Room = Game.rooms[i];
+
+      CreepManager.run(room);
+
+      // Clears any non-existing creep memory.
+      for (const name in Memory.creeps) {
+        const creep: CreepMemory = Memory.creeps[name];
+
+        if (creep.room === room.name) {
+          if (!Game.creeps[name]) {
+            log.info("Clearing non-existing creep memory:", name);
+            delete Memory.creeps[name];
+          }
+        }
+      }
+    }
+  }
 }
 
-function mainLoop()
-{
-    Main.go();
+function mainLoop() {
+  Main.go();
 }
 
 /**

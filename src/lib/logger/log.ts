@@ -1,5 +1,7 @@
+import { SourceMapConsumer } from "source-map/source-map";
 import * as Config from "../../config";
 import { LogLevels } from "./logLevels";
+import * as M from "../../mem";
 
 // <caller> (<source>:<line>:<column>)
 const stackLineRe = /([^ ]*) \(([^:]*):([0-9]*):([0-9]*)\)/;
@@ -64,15 +66,14 @@ function time(): string {
 }
 
 export class Log {
-  public static sourceMap: any;
+  static sourceMap?: SourceMapConsumer;
 
   public static loadSourceMap() {
     try {
       // tslint:disable-next-line
-      var SourceMapConsumer = require("source-map").SourceMapConsumer;
       const map = require("main.js.map");
       if (map) {
-        Log.sourceMap = new SourceMapConsumer(map);
+        this.sourceMap = new SourceMapConsumer(require("main.js.map"));
       }
     } catch (err) {
       console.log("failed to load source map", err);
@@ -80,22 +81,22 @@ export class Log {
   }
 
   public get level(): number {
-    return Memory.log.level;
+    return M.m().log.level;
   }
   public set level(value: number) {
-    Memory.log.level = value;
+    M.m().log.level = value;
   }
   public get showSource(): boolean {
-    return Memory.log.showSource;
+    return M.m().log.showSource;
   }
   public set showSource(value: boolean) {
-    Memory.log.showSource = value;
+    M.m().log.showSource = value;
   }
   public get showTick(): boolean {
-    return Memory.log.showTick;
+    return M.m().log.showTick;
   }
   public set showTick(value: boolean) {
-    Memory.log.showTick = value;
+    M.m().log.showTick = value;
   }
 
   private _maxFileString: number = 0;
@@ -195,6 +196,7 @@ export class Log {
   private adjustFileLine(visibleText: string, line: string): string {
     const newPad = Math.max(visibleText.length, this._maxFileString);
     this._maxFileString = Math.min(newPad, Config.LOG_MAX_PAD);
+    this._maxFileString = Config.LOG_MAX_PAD;
 
     return `|${_.padRight(line, line.length + this._maxFileString - visibleText.length, " ")}|`;
   }
