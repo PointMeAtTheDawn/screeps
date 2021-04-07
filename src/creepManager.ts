@@ -3,6 +3,7 @@ import * as harvester from "./role.harvester";
 import * as builder from "./role.builder";
 import { log } from "./lib/logger/log";
 import { profileRecord } from "./lib/Profiler";
+import { bodies } from "./creepBodies";
 
 export let creeps: Creep[];
 export let creepCount: number = 0;
@@ -48,26 +49,29 @@ function _buildMissingCreeps(room: Room) {
     }
   });
 
-  if (builders.length < 6) {
-    log.debug("Not enough builders");
-    bodyParts = [WORK, CARRY, CARRY, MOVE, MOVE];
-    _.each(spawns, (spawn: Spawn) => {
-      _spawnCreep(spawn, bodyParts, "builder");
-    });
-  }
-
-  if (harvesters.length < 8) {
+  if (harvesters.length < 10) {
     log.debug("Not enough harvesters");
-    if (harvesters.length < 1 || room.energyCapacityAvailable <= 800) {
-      bodyParts = [WORK, WORK, CARRY, MOVE];
-    } else if (room.energyCapacityAvailable > 800) {
-      bodyParts = [WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE];
-    }
+    bodyParts = _buildCreep("harvester", room.energyCapacityAvailable);
 
     _.each(spawns, (spawn: Spawn) => {
       _spawnCreep(spawn, bodyParts, "harvester");
     });
+    return;
   }
+
+  if (builders.length < 8) {
+    log.debug("Not enough builders");
+    bodyParts = _buildCreep("builder", room.energyCapacityAvailable);
+    _.each(spawns, (spawn: Spawn) => {
+      _spawnCreep(spawn, bodyParts, "builder");
+    });
+    return;
+  }
+
+}
+
+function _buildCreep(role: string, capacity: number): BodyPartConstant[] {
+  return bodies[capacity];
 }
 
 function _spawnCreep(spawn: Spawn, bodyParts: BodyPartConstant[], role: string) {

@@ -2,8 +2,16 @@ export function run(creep: Creep): void {
   const close = creep.pos.findClosestByRange<FIND_SOURCES_ACTIVE>(FIND_SOURCES_ACTIVE);
   const sites = creep.room.find<FIND_CONSTRUCTION_SITES>(FIND_CONSTRUCTION_SITES);
 
+  if (close != null && creep.store.getFreeCapacity() !== 0 && _tryHarvest(creep, close) === 0) {return}
+  if (sites.length > 0 && creep.store.getUsedCapacity(RESOURCE_ENERGY) !== 0 && _tryBuild(creep, sites[0]) === 0) {return}
+
   if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0 && close != null) {
     _moveToHarvest(creep, close);
+    return;
+  }
+
+  if (creep.room.controller && creep.room.controller.ticksToDowngrade < 100) {
+    _moveToUpgrade(creep, creep.room.controller);
     return;
   }
 
