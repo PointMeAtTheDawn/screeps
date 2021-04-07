@@ -1,11 +1,13 @@
 import * as Config from "config";
 import * as harvester from "./role.harvester";
+import * as upgrader from "./role.upgrader";
 import { log } from "./lib/logger/log";
 import { profileRecord } from "./lib/Profiler";
 
 export let creeps: Creep[];
 export let creepCount: number = 0;
 export let harvesters: Creep[] = [];
+export let upgraders: Creep[] = [];
 
 export function run(room: Room): void {
   profileRecord("_loadCreeps", true);
@@ -22,6 +24,11 @@ export function run(room: Room): void {
       harvester.run(creep);
       profileRecord("harvester.run", false);
     }
+    if (creep.memory.role === "upgrader") {
+      profileRecord("upgrader.run", true);
+      upgrader.run(creep);
+      profileRecord("upgrader.run", false);
+    }
   });
 }
 
@@ -29,6 +36,7 @@ function _loadCreeps(room: Room) {
   creeps = room.find<FIND_MY_CREEPS>(FIND_MY_CREEPS);
   creepCount = _.size(creeps);
   harvesters = _.filter(creeps, creep => creep.memory.role === "harvester");
+  upgraders = _.filter(creeps, creep => creep.memory.role === "upgrader");
 }
 
 function _buildMissingCreeps(room: Room) {
@@ -40,7 +48,16 @@ function _buildMissingCreeps(room: Room) {
     }
   });
 
-  if (harvesters.length < 2) {
+  if (upgraders.length < 1) {
+    log.debug("Not enough upgraders");
+    bodyParts = [WORK, CARRY, CARRY, MOVE, MOVE];
+    _.each(spawns, (spawn: Spawn) => {
+      _spawnCreep(spawn, bodyParts, "upgrader");
+    });
+  }
+
+  if (harvesters.length < 6) {
+    log.debug("Not enough harvesters");
     if (harvesters.length < 1 || room.energyCapacityAvailable <= 800) {
       bodyParts = [WORK, WORK, CARRY, MOVE];
     } else if (room.energyCapacityAvailable > 800) {
@@ -51,14 +68,15 @@ function _buildMissingCreeps(room: Room) {
       _spawnCreep(spawn, bodyParts, "harvester");
     });
   }
+
 }
 
 function _spawnCreep(spawn: Spawn, bodyParts: BodyPartConstant[], role: string) {
   const uuid: number = Memory.uuid;
-  let status: number | string = spawn.spawnCreep(bodyParts, "unused", undefined);
+  let status: number | string = spawn.spawnCreep(bodyParts, "unused", {dryRun: true});
 
   const properties: { [key: string]: any } = {
-    role,
+    memory: {role},
     room: spawn.room.name
   };
 
