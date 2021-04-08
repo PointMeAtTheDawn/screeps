@@ -34,7 +34,8 @@ export class Main {
       for (const name in Memory.creeps) {
         const creep: CreepMemory = Memory.creeps[name];
 
-        if (creep.room === room.name) {
+        // TODO update latter clause when multi-room
+        if (creep.room === room.name || creep.room === undefined) {
           if (!Game.creeps[name]) {
             log.info("Clearing non-existing creep memory:", name);
             delete Memory.creeps[name];

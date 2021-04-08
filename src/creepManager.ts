@@ -15,6 +15,11 @@ export function run(room: Room): void {
   _loadCreeps(room);
   +profileRecord("_loadCreeps", false);
 
+  if (Game.time % 10 === 0) {
+    log.debug(`Harvesters ${harvesters.length}, Builders ${builders.length}`);
+  }
+
+
   profileRecord("_buildMissingCreeps", true);
   _buildMissingCreeps(room);
   profileRecord("_buildMissingCreeps", false);
@@ -49,8 +54,7 @@ function _buildMissingCreeps(room: Room) {
     }
   });
 
-  if (harvesters.length < 10) {
-    log.debug("Not enough harvesters");
+  if (harvesters.length < 8) {
     bodyParts = _buildCreep("harvester", room.energyCapacityAvailable);
 
     _.each(spawns, (spawn: Spawn) => {
@@ -59,8 +63,7 @@ function _buildMissingCreeps(room: Room) {
     return;
   }
 
-  if (builders.length < 8) {
-    log.debug("Not enough builders");
+  if (builders.length < 6) {
     bodyParts = _buildCreep("builder", room.energyCapacityAvailable);
     _.each(spawns, (spawn: Spawn) => {
       _spawnCreep(spawn, bodyParts, "builder");
@@ -79,7 +82,8 @@ function _spawnCreep(spawn: Spawn, bodyParts: BodyPartConstant[], role: string) 
   let status: number | string = spawn.spawnCreep(bodyParts, "unused", { dryRun: true });
 
   const properties: { [key: string]: any } = {
-    memory: { role },
+    memory: { role,
+    working: false },
     room: spawn.room.name
   };
 

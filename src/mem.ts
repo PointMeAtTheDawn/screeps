@@ -46,23 +46,7 @@ export interface MyCreepMemory {
   name: string;
   role: CreepRoles;
   roleString: string;
-  log: boolean;
-  gathering: boolean;
-  assignedMineTaskId?: number;
-  assignedContainerId?: string;
-  assignedTargetId?: string;
-  isUpgradingController: boolean;
-  repairTargetId?: string;
-
-  // roomName ?: string;
-  // path ?: CreepPath;
-  // assignedCreepTaskId ?: number;
-  // assignedEnergyTaskId ?: number;
-  // assignedPullEnergyFromStorage : boolean;
-  // attackWave ?: CreepAttackWaveMemory;
-  // claimerRoomTarget ?: string;
-  // customControl ?: number;
-  // customControlState ?: number;
+  job: string;
 }
 
 export function cm(creep: Creep): MyCreepMemory {
