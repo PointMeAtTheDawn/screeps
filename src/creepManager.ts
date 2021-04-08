@@ -15,8 +15,9 @@ export function run(room: Room): void {
   _loadCreeps(room);
   +profileRecord("_loadCreeps", false);
 
-  if (Game.time % 10 === 0) {
+  if (Game.time % 100 === 0) {
     log.debug(`Harvesters ${harvesters.length}, Builders ${builders.length}`);
+    log.debug(`Progress ${room.controller?.progress}`);
   }
 
 

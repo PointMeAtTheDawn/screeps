@@ -45,11 +45,15 @@ function _upgradeIfLow(creep: Creep): boolean {
   return false;
 }
 
+type Repairable =
+  | StructureRoad
+  | StructureContainer;
+
 function _repairIfLow(creep: Creep): boolean {
-  const roads = creep.room.find<FIND_STRUCTURES>(FIND_STRUCTURES).filter(s => {s.structureType === STRUCTURE_ROAD}) as StructureRoad[];
-  roads.filter(r => {r.ticksToDecay < 100});
-  if (roads.length > 0) {
-    const toRepair = creep.pos.findClosestByPath(roads);
+  const repairables = creep.room.find<FIND_STRUCTURES>(FIND_STRUCTURES).filter(s => {s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_CONTAINER}) as Repairable[];
+  repairables.filter(r => {r.hits/r.hitsMax < .9});
+  if (repairables.length > 0) {
+    const toRepair = creep.pos.findClosestByPath(repairables);
     if (toRepair) {
       _moveToRepair(creep, toRepair);
       return true;
@@ -94,11 +98,11 @@ function _moveToBuild(creep: Creep, target: ConstructionSite): void {
   }
 }
 
-function _tryRepair(creep: Creep, target: StructureRoad): number {
+function _tryRepair(creep: Creep, target: Repairable): number {
   return creep.repair(target);
 }
 
-function _moveToRepair(creep: Creep, target: StructureRoad): void {
+function _moveToRepair(creep: Creep, target: Repairable): void {
   if (_tryRepair(creep, target) === ERR_NOT_IN_RANGE) {
     creep.moveTo(target.pos);
   }
