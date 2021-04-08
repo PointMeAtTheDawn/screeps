@@ -47,11 +47,12 @@ function _upgradeIfLow(creep: Creep): boolean {
 
 type Repairable =
   | StructureRoad
-  | StructureContainer;
+  | StructureContainer
+  | StructureRampart;
 
 function _repairIfLow(creep: Creep): boolean {
-  const repairables = creep.room.find<FIND_STRUCTURES>(FIND_STRUCTURES).filter(s => {s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_CONTAINER}) as Repairable[];
-  repairables.filter(r => {r.hits/r.hitsMax < .9});
+  let repairables = creep.room.find<FIND_STRUCTURES>(FIND_STRUCTURES).filter(s => s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_CONTAINER || s.structureType === STRUCTURE_RAMPART) as Repairable[];
+  repairables = repairables.filter(r => r.hits/r.hitsMax < _getRepairRatio());
   if (repairables.length > 0) {
     const toRepair = creep.pos.findClosestByPath(repairables);
     if (toRepair) {
@@ -62,10 +63,16 @@ function _repairIfLow(creep: Creep): boolean {
   return false;
 }
 
+function _getRepairRatio(): number {
+  let rem = Game.time % 10000;
+  if (0 < rem && rem < 100 ) {
+    return .1
+  }
+  return .9;
+}
+
 function _buildThings(creep: Creep): boolean {
-  const spawn = creep.room.find<Spawn>(FIND_MY_SPAWNS)[0];
   const sites = creep.room.find<FIND_CONSTRUCTION_SITES>(FIND_CONSTRUCTION_SITES);
-  const close = spawn.pos.findClosestByRange<FIND_SOURCES_ACTIVE>(FIND_SOURCES_ACTIVE);
 
   if (sites.length > 0) {
     const toBuild = creep.pos.findClosestByPath(sites);

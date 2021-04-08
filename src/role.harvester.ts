@@ -28,15 +28,20 @@ function _work(creep: Creep) {
   const extensions = creep.room.find<FIND_MY_STRUCTURES>(FIND_MY_STRUCTURES).filter(s => {return s.structureType === STRUCTURE_EXTENSION}) as StructureExtension[];
   const extensionsToFill = extensions.filter(e => e.store.getFreeCapacity(RESOURCE_ENERGY) !== 0);
   if (extensionsToFill.length > 0) {
-    _moveToDropEnergy(creep, extensionsToFill[0]);
+    _moveToDropEnergy(creep, creep.pos.findClosestByPath(extensionsToFill));
     return;
   }
 
   const containers = creep.room.find<FIND_STRUCTURES>(FIND_STRUCTURES).filter(s => {return s.structureType === STRUCTURE_CONTAINER}) as StructureContainer[];
   const containersToFill = containers.filter(e => e.store.getFreeCapacity(RESOURCE_ENERGY) !== 0);
   if (containersToFill.length > 0) {
-    _moveToDropEnergy(creep, containersToFill[0]);
+    _moveToDropEnergy(creep, creep.pos.findClosestByPath(containersToFill));
     return;
+  }
+  const towers = creep.room.find(FIND_MY_STRUCTURES).filter(s => s.structureType === STRUCTURE_TOWER);
+  const tower = creep.pos.findClosestByRange(towers);
+  if (tower) {
+    creep.moveTo(tower);
   }
 }
 
@@ -59,8 +64,10 @@ function _tryEnergyDropOff(creep: Creep, target: Spawn | Structure): number {
   return creep.transfer(target, RESOURCE_ENERGY);
 }
 
-function _moveToDropEnergy(creep: Creep, target: Spawn | Structure): void {
-  if (_tryEnergyDropOff(creep, target) === ERR_NOT_IN_RANGE) {
-    creep.moveTo(target.pos);
+function _moveToDropEnergy(creep: Creep, target?: Spawn | Structure | null): void {
+  if (target) {
+    if (_tryEnergyDropOff(creep, target) === ERR_NOT_IN_RANGE) {
+      creep.moveTo(target.pos);
+    }
   }
 }
