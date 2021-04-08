@@ -30,6 +30,11 @@ export class Main {
 
       CreepManager.run(room);
 
+      if (room.find(FIND_HOSTILE_CREEPS).length > 0 && room.controller?.safeModeAvailable) {
+        room.controller?.activateSafeMode;
+        Game.notify("UNDER ATTACK AAAA!");
+      }
+
       // Clears any non-existing creep memory.
       for (const name in Memory.creeps) {
         const creep: CreepMemory = Memory.creeps[name];

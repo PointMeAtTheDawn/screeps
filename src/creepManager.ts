@@ -64,7 +64,12 @@ function _buildMissingCreeps(room: Room) {
     return;
   }
 
-  if (builders.length < 6) {
+  let toBuild: number = 6;
+  if (room.find(FIND_CONSTRUCTION_SITES).length > 3) {
+    toBuild = 8;
+  }
+
+  if (builders.length < toBuild) {
     bodyParts = _buildCreep("builder", room.energyCapacityAvailable);
     _.each(spawns, (spawn: Spawn) => {
       _spawnCreep(spawn, bodyParts, "builder");
