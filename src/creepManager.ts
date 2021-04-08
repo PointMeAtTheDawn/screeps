@@ -56,7 +56,11 @@ function _buildMissingCreeps(room: Room) {
   });
 
   if (harvesters.length < 8) {
-    bodyParts = _buildCreep("harvester", room.energyCapacityAvailable);
+    if (harvesters.length < 2) {
+      bodyParts = _buildCreep("harvester", 300);
+    } else {
+      bodyParts = _buildCreep("harvester", room.energyCapacityAvailable);
+    }
 
     _.each(spawns, (spawn: Spawn) => {
       _spawnCreep(spawn, bodyParts, "harvester");
