@@ -66,9 +66,9 @@ function _repairIfLow(creep: Creep): boolean {
 function _getRepairRatio(): number {
   let rem = Game.time % 10000;
   if (0 < rem && rem < 100 ) {
-    return .1
+    return .9
   }
-  return .9;
+  return .1;
 }
 
 function _buildThings(creep: Creep): boolean {

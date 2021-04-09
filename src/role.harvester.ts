@@ -25,14 +25,14 @@ function _work(creep: Creep) {
     _moveToDropEnergy(creep, spawn);
     return;
   }
-  const extensions = creep.room.find<FIND_MY_STRUCTURES>(FIND_MY_STRUCTURES).filter(s => {return s.structureType === STRUCTURE_EXTENSION}) as StructureExtension[];
+  const extensions = creep.room.find<FIND_MY_STRUCTURES>(FIND_MY_STRUCTURES).filter(s => s.structureType === STRUCTURE_EXTENSION) as StructureExtension[];
   const extensionsToFill = extensions.filter(e => e.store.getFreeCapacity(RESOURCE_ENERGY) !== 0);
   if (extensionsToFill.length > 0) {
     _moveToDropEnergy(creep, creep.pos.findClosestByPath(extensionsToFill));
     return;
   }
 
-  const containers = creep.room.find<FIND_STRUCTURES>(FIND_STRUCTURES).filter(s => {return s.structureType === STRUCTURE_CONTAINER}) as StructureContainer[];
+  const containers = creep.room.find<FIND_STRUCTURES>(FIND_STRUCTURES).filter(s => s.structureType === STRUCTURE_CONTAINER) as StructureContainer[];
   const containersToFill = containers.filter(e => e.store.getFreeCapacity(RESOURCE_ENERGY) !== 0);
   if (containersToFill.length > 0) {
     _moveToDropEnergy(creep, creep.pos.findClosestByPath(containersToFill));
@@ -49,13 +49,26 @@ function _tryHarvest(creep: Creep, target: Source): number {
   return creep.harvest(target);
 }
 
+function _tryFillUp(creep: Creep, target: StructureContainer): number {
+    return creep.withdraw(target, RESOURCE_ENERGY);
+}
+
 function _moveToHarvest(creep: Creep): void {
   const spawn = creep.room.find<Spawn>(FIND_MY_SPAWNS)[0];
   const close = spawn.pos.findClosestByRange<FIND_SOURCES_ACTIVE>(FIND_SOURCES_ACTIVE);
   const far = creep.room.find<FIND_SOURCES_ACTIVE>(FIND_SOURCES_ACTIVE).filter(s => s !== close)[0];
-  if (far != null) {
+  if (far && far.energy !== 0) {
     if (_tryHarvest(creep, far) === ERR_NOT_IN_RANGE) {
       creep.moveTo(far.pos);
+    }
+  } else {
+    let containers = creep.room.find<FIND_STRUCTURES>(FIND_STRUCTURES).filter(s => s.structureType === STRUCTURE_CONTAINER) as StructureContainer[];
+    containers = containers.filter(c => c.store.getUsedCapacity(RESOURCE_ENERGY) > 0);
+    const closestContainer = creep.pos.findClosestByRange(containers);
+    if (closestContainer) {
+      if (_tryFillUp(creep, closestContainer) === ERR_NOT_IN_RANGE) {
+        creep.moveTo(closestContainer.pos);
+      }
     }
   }
 }

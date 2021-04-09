@@ -55,7 +55,7 @@ function _buildMissingCreeps(room: Room) {
     }
   });
 
-  if (harvesters.length < 8) {
+  if (harvesters.length < 4) {
     if (harvesters.length < 2) {
       bodyParts = _buildCreep("harvester", 300);
     } else {
@@ -68,9 +68,9 @@ function _buildMissingCreeps(room: Room) {
     return;
   }
 
-  let toBuild: number = 6;
-  if (room.find(FIND_CONSTRUCTION_SITES).length > 3) {
-    toBuild = 8;
+  let toBuild: number = 2;
+  if (room.find(FIND_CONSTRUCTION_SITES).length > 0) {
+    toBuild = 3;
   }
 
   if (builders.length < toBuild) {
